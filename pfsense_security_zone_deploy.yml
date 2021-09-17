@@ -5,30 +5,30 @@
   #connection: paramiko
   collections:
     - pfsensible.core
-  become: yes
-  become_method: sudo
+  #become: yes
+  #become_method: sudo
   vars:
     network_card: em1
-    vlan: 31
+    vlan: 100
     interface_name: zdns
 
   tasks:
-#  - name: add vlans pfsense 
-#    pfsense_vlan:
-#      interface: "{{ network_card }}"
-#      vlan_id: "{{ vlan }}"
-#      descr: "{{ interface_name }}"
-#      priority: 0
-#      state: present
+  - name: add vlans pfsense
+    pfsense_vlan:
+      interface: "{{ network_card }}"
+      vlan_id: "{{ vlan }}"
+      descr: "{{ interface_name }}"
+      priority: 0
+      state: present
 
-#  - name: Add interface vlan "{{ interface_name }}_vlan{{ vlan }}"
-#    pfsense_interface:
-#      interface: "{{ network_card }}.{{ vlan }}"
-#      descr: "{{ interface_name }}_vlan{{ vlan }}"
-#      ipv4_type: static
-#      ipv4_address: "10.31.{{ vlan }}.1"
-#      enable: True
-#      state: present
+  - name: Add interface vlan "{{ interface_name }}_vlan{{ vlan }}"
+    pfsense_interface:
+      interface: "{{ network_card }}.{{ vlan }}"
+      descr: "{{ interface_name }}_vlan{{ vlan }}"
+      ipv4_type: static
+      ipv4_address: "10.44.{{ vlan }}.1"
+      enable: True
+      state: present
 
   - name: "Add standard block rule"
     pfsense_rule:
@@ -150,7 +150,7 @@
      protocol: tcp
      source: "{{ interface_name }}_vlan{{ vlan }}"
      destination: proxy_servers
-     destination_port: 8888
+     destination_port: 3128
      before: 'bottom'
      state: present
 
@@ -167,9 +167,12 @@
      before: 'bottom'
      state: present
 
-#  - name: "allow interface to ansible rule"
+# uncomment these to allow automation hosts and bastion access.
+# i use global floating rules to allow access.
+
+#  - name: "allow interface to zansible rule"
 #    pfsense_rule:
-#     name: 'allow interface to ansible'
+#     name: 'allow interface to zansible'
 #     action: pass
 #     interface: "{{ interface_name }}_vlan{{ vlan }}"
 #     ipprotocol: inet
@@ -195,6 +198,7 @@
 #     before: 'bottom'
 #     state: present
 
+# to allow access to internett change interface to any
   - name: "allow interface to interface rule"
     pfsense_rule:
      name: 'allow interface to interface'
@@ -204,6 +208,5 @@
      protocol: any
      source: "{{ interface_name }}_vlan{{ vlan }}"
      destination: "{{ interface_name }}_vlan{{ vlan }}"
-     #after: allow interface to  rule
      before: 'bottom'
      state: present
