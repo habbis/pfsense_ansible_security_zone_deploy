@@ -2,7 +2,7 @@
 
 
 
-The playbook setup mystandard pfsense security zone that is  vlan + interface + firewall rules = security zone.
+The playbook setup mystandard pfsense security zone and its  vlan + interface + firewall rules = security zone.
 
 
 
