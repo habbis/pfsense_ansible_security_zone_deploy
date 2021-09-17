@@ -1,4 +1,6 @@
-# pfsense_ansible_standard_setup
+# pfsense ansible security zone setup
 
 
-The playbook setup mystandard pfsense interface + vlan
+The playbook setup mystandard pfsense security zone that is  vlan + interface + firewall rules = security zone.
+
+
