@@ -1,0 +1,209 @@
+---
+- hosts: pfsense
+  remote_user: root
+  gather_facts: false
+  #connection: paramiko
+  collections:
+    - pfsensible.core
+  become: yes
+  become_method: sudo
+  vars:
+    network_card: em1
+    vlan: 31
+    interface_name: zdns
+
+  tasks:
+#  - name: add vlans pfsense 
+#    pfsense_vlan:
+#      interface: "{{ network_card }}"
+#      vlan_id: "{{ vlan }}"
+#      descr: "{{ interface_name }}"
+#      priority: 0
+#      state: present
+
+#  - name: Add interface vlan "{{ interface_name }}_vlan{{ vlan }}"
+#    pfsense_interface:
+#      interface: "{{ network_card }}.{{ vlan }}"
+#      descr: "{{ interface_name }}_vlan{{ vlan }}"
+#      ipv4_type: static
+#      ipv4_address: "10.31.{{ vlan }}.1"
+#      enable: True
+#      state: present
+
+  - name: "Add standard block rule"
+    pfsense_rule:
+     name: 'standard network block'
+     action: block
+     interface: "{{ interface_name }}_vlan{{ vlan }}"
+     ipprotocol: inet
+     protocol: any
+     source: any
+     destination: 10.0.0.0/16
+     after: 'top'
+     state: present
+
+  - name: "Add zhome block rule"
+    pfsense_rule:
+     name: 'zhome network block'
+     action: block
+     interface: "{{ interface_name }}_vlan{{ vlan }}"
+     ipprotocol: inet
+     protocol: any
+     source: any
+     destination: 192.168.1.0/24
+     after: 'top'
+     state: present
+
+
+  - name: "allow interface to zdns rule"
+    pfsense_rule:
+     name: 'allow interface to zdns servers'
+     action: pass
+     interface: "{{ interface_name }}_vlan{{ vlan }}"
+     ipprotocol: inet
+     protocol: tcp
+     source: "{{ interface_name }}_vlan{{ vlan }}"
+     destination: dns_servers
+     destination_port: 53
+     before: 'bottom'
+     state: present
+
+  - name: " allow interface to zntp rule"
+    pfsense_rule:
+     name: 'allow interface to zntp'
+     action: pass
+     interface: "{{ interface_name }}_vlan{{ vlan }}"
+     ipprotocol: inet
+     protocol: udp
+     destination_port: 123
+     source: "{{ interface_name }}_vlan{{ vlan }}"
+     destination: ntp_servers
+     #after: 'allow interface to dns rule'
+     before: 'bottom'
+     state: present
+
+  - name: "allow interface to zmoncore rule"
+    pfsense_rule:
+     name: 'allow interface to zmoncore'
+     action: pass
+     interface: "{{ interface_name }}_vlan{{ vlan }}"
+     ipprotocol: inet
+     protocol: tcp/udp
+     source: "{{ interface_name }}_vlan{{ vlan }}"
+     destination: moncore_servers
+     destination_port: 8086
+     #after: allow interface to ntp rule
+     before: 'bottom'
+     state: present
+
+  - name: "allow interface to zloghost rule"
+    pfsense_rule:
+     name: 'allow interface to zloghost'
+     action: pass
+     interface: "{{ interface_name }}_vlan{{ vlan }}"
+     ipprotocol: inet
+     protocol: tcp/udp
+     source: "{{ interface_name }}_vlan{{ vlan }}"
+     destination: loghost_servers
+     destination_port: 514
+     #after: allow interface to moncore rule
+     before: 'bottom'
+     state: present
+
+  - name: "allow interface to zmgmt rule"
+    pfsense_rule:
+     name: 'allow interface to zmgmt'
+     action: pass
+     interface: "{{ interface_name }}_vlan{{ vlan }}"
+     ipprotocol: inet
+     protocol: tcp
+     source: "{{ interface_name }}_vlan{{ vlan }}"
+     destination: mgmt_servers
+     # ldap
+     #destination_port: 389
+     # ldaps
+     destination_port: 636
+     #after: allow interface to loghost rule
+     before: 'bottom'
+     state: present
+
+
+  - name: "allow interface to zgit servers rule"
+    pfsense_rule:
+     name: 'allow interface to zgit servers'
+     action: pass
+     interface: "{{ interface_name }}_vlan{{ vlan }}"
+     ipprotocol: inet
+     protocol: tcp
+     source: "{{ interface_name }}_vlan{{ vlan }}"
+     destination: git_servers
+     destination_port: 22-443
+     before: 'bottom'
+     state: present
+
+  - name: "allow interface to zproxy servers rule"
+    pfsense_rule:
+     name: 'allow interface to zproxy servers'
+     action: pass
+     interface: "{{ interface_name }}_vlan{{ vlan }}"
+     ipprotocol: inet
+     protocol: tcp
+     source: "{{ interface_name }}_vlan{{ vlan }}"
+     destination: proxy_servers
+     destination_port: 8888
+     before: 'bottom'
+     state: present
+
+  - name: "allow interface to zapt_cache servers rule"
+    pfsense_rule:
+     name: 'allow interface to zapt_cache servers'
+     action: pass
+     interface: "{{ interface_name }}_vlan{{ vlan }}"
+     ipprotocol: inet
+     protocol: tcp
+     source: "{{ interface_name }}_vlan{{ vlan }}"
+     destination: zapt_cache_servers
+     destination_port: 80-443
+     before: 'bottom'
+     state: present
+
+#  - name: "allow interface to ansible rule"
+#    pfsense_rule:
+#     name: 'allow interface to ansible'
+#     action: pass
+#     interface: "{{ interface_name }}_vlan{{ vlan }}"
+#     ipprotocol: inet
+#     protocol: tcp
+#     source: ansible_servers
+#     destination: "{{ interface_name }}_vlan{{ vlan }}"
+#     destination_port: 22
+     #after: allow interface to mgmt rule
+#     before: 'bottom'
+#     state: present
+
+#  - name: "allow interface to bastion_mgmt rule"
+#    pfsense_rule:
+#     name: 'allow interface to bastion_mgmt'
+#     action: pass
+#     interface: "{{ interface_name }}_vlan{{ vlan }}"
+#     ipprotocol: inet
+#     protocol: tcp
+#     source: "{{ interface_name }}_vlan{{ vlan }}"
+#     destination: bastion_mgmt_servers
+     #destination_port: 
+     #after: allow interface to ansible rule
+#     before: 'bottom'
+#     state: present
+
+  - name: "allow interface to interface rule"
+    pfsense_rule:
+     name: 'allow interface to interface'
+     action: pass
+     interface: "{{ interface_name }}_vlan{{ vlan }}"
+     ipprotocol: inet
+     protocol: any
+     source: "{{ interface_name }}_vlan{{ vlan }}"
+     destination: "{{ interface_name }}_vlan{{ vlan }}"
+     #after: allow interface to  rule
+     before: 'bottom'
+     state: present
