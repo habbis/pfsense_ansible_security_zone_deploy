@@ -1,0 +1,27 @@
+---
+- hosts: pfsense
+  remote_user: root
+  gather_facts: false
+  #connection: paramiko
+  collections:
+    - pfsensible.core
+
+  #remote_user: xo
+  #remote_user: user
+  #remote_user: ansible
+  #remote_user: ebbestad
+  #become: yes
+  #become_method: sudo
+  vars:
+    alias_name: dns_serves
+    network1: 10.50.140.0/24
+    network2: 10.50.141.0/24
+    ipv4_address: 10.50.131.20
+
+
+  tasks:
+  - name: Add adservers alias
+    pfsense_alias:
+      name: "{{ alias_name }}"
+      address:  "{{ network1 }} {{ network2 }}  {{ ipv4_address }}"
+      state: present
