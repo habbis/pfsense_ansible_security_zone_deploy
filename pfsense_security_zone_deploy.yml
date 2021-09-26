@@ -30,9 +30,6 @@
       enable: True
       state: present
 
-  
-
-
   - name: "allow interface to zdns rule"
     pfsense_rule:
      name: 'allow interface to zdns servers'
