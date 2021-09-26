@@ -26,33 +26,11 @@
       interface: "{{ network_card }}.{{ vlan }}"
       descr: "{{ interface_name }}_vlan{{ vlan }}"
       ipv4_type: static
-      ipv4_address: "10.44.{{ vlan }}.1"
+      ipv4_address: "10.31.{{ vlan }}.1"
       enable: True
       state: present
 
-  - name: "Add standard block rule"
-    pfsense_rule:
-     name: 'standard network block'
-     action: block
-     interface: "{{ interface_name }}_vlan{{ vlan }}"
-     ipprotocol: inet
-     protocol: any
-     source: any
-     destination: 10.0.0.0/16
-     after: 'top'
-     state: present
-
-  - name: "Add zhome block rule"
-    pfsense_rule:
-     name: 'zhome network block'
-     action: block
-     interface: "{{ interface_name }}_vlan{{ vlan }}"
-     ipprotocol: inet
-     protocol: any
-     source: any
-     destination: 192.168.1.0/24
-     after: 'top'
-     state: present
+  
 
 
   - name: "allow interface to zdns rule"
@@ -61,7 +39,7 @@
      action: pass
      interface: "{{ interface_name }}_vlan{{ vlan }}"
      ipprotocol: inet
-     protocol: tcp
+     protocol: tcp/udp
      source: "{{ interface_name }}_vlan{{ vlan }}"
      destination: dns_servers
      destination_port: 53
@@ -197,6 +175,18 @@
      #after: allow interface to ansible rule
 #     before: 'bottom'
 #     state: present
+
+- name: "Add standard block rule"
+    pfsense_rule:
+     name: 'standard network block'
+     action: block
+     interface: "{{ interface_name }}_vlan{{ vlan }}"
+     ipprotocol: inet
+     protocol: any
+     source: any
+     destination: RFC_1918
+     after: 'top'
+     state: present
 
 # to allow access to internett change interface to any
   - name: "allow interface to interface rule"
