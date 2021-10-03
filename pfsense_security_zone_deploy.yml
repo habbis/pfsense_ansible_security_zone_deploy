@@ -174,7 +174,7 @@
 #     state: present
 
 # this block rule must be here or it will block those above.
-- name: "Add standard block rule"
+  - name: "Add standard block rule"
     pfsense_rule:
      name: 'standard network block'
      action: block
