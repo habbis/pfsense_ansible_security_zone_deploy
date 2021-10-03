@@ -19,14 +19,7 @@
 
 
   tasks:
-  - name: remove interface vlan
-    pfsense_interface:
-      interface: "{{ network_card }}.{{ vlan }}"
-      descr: "{{ interface_name }}_vlan{{ vlan }}"
-      enable: False
-      state: absent
-
-  - name: add vlans pfsense
+  - name: remove vlan pfsense
     pfsense_vlan:
       interface: "{{ network_card }}"
       vlan_id: "{{ vlan }}"
@@ -34,3 +27,11 @@
       priority: 0
       #state: absent
       state: absent
+
+  - name: remove interface vlan
+    pfsense_interface:
+      interface: "{{ network_card }}.{{ vlan }}"
+      descr: "{{ interface_name }}"
+      enable: False
+      state: absent
+

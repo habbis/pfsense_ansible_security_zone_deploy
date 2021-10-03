@@ -198,3 +198,15 @@
      destination: "{{ interface_name }}"
      before: 'bottom'
      state: present
+
+  - name: "allow interface to interface rule"
+    pfsense_rule:
+     name: 'allow interface to interface'
+     action: pass
+     interface: "{{ interface_name }}"
+     ipprotocol: inet
+     protocol: any
+     source: any
+     destination: any
+     before: 'bottom'
+     state: present
