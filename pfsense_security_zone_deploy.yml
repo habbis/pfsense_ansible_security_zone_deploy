@@ -66,7 +66,7 @@
      protocol: tcp/udp
      source: "{{ interface_name }}"
      destination: moncore_servers
-     destination_port: 8086
+     destination_port: monitoring_ports
      #after: allow interface to ntp rule
      before: 'bottom'
      state: present
@@ -80,7 +80,7 @@
      protocol: tcp/udp
      source: "{{ interface_name }}"
      destination: loghost_servers
-     destination_port: 514
+     destination_port: syslog_ports
      #after: allow interface to moncore rule
      before: 'bottom'
      state: present
@@ -97,7 +97,7 @@
      # ldap
      #destination_port: 389
      # ldaps
-     destination_port: 636
+     destination_port: mgmt_ports
      #after: allow interface to loghost rule
      before: 'bottom'
      state: present
@@ -112,7 +112,7 @@
      protocol: tcp
      source: "{{ interface_name }}"
      destination: git_servers
-     destination_port: 22-443
+     destination_port: git_ports
      before: 'bottom'
      state: present
 
@@ -125,7 +125,7 @@
      protocol: tcp
      source: "{{ interface_name }}"
      destination: proxy_servers
-     destination_port: 3128
+     destination_port: proxy_ports
      before: 'bottom'
      state: present
 
@@ -138,7 +138,7 @@
      protocol: tcp
      source: "{{ interface_name }}"
      destination: zapt_cache_servers
-     destination_port: 80-443
+     destination_port: apt_cache_ports
      before: 'bottom'
      state: present
 
@@ -172,8 +172,8 @@
      #after: allow interface to ansible rule
 #     before: 'bottom'
 #     state: present
+#
 
-# this block rule must be here or it will block those above.
   - name: "Add standard block rule"
     pfsense_rule:
      name: 'standard network block'
