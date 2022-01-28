@@ -9,8 +9,8 @@
   #become_method: sudo
   vars:
     network_card: em1
-    vlan: 100
-    interface_name: zdns
+    vlan: 61
+    interface_name: vault
 
   tasks:
   - name: add vlans pfsense
@@ -30,9 +30,9 @@
       enable: True
       state: present
 
-  - name: "allow interface to zdns rule"
+  - name: "allow interface to dns rule"
     pfsense_rule:
-     name: 'allow interface to zdns servers'
+     name: 'allow interface to dns servers'
      action: pass
      interface: "{{ interface_name }}"
      ipprotocol: inet
@@ -43,9 +43,9 @@
      before: 'bottom'
      state: present
 
-  - name: " allow interface to zntp rule"
+  - name: " allow interface to ntp rule"
     pfsense_rule:
-     name: 'allow interface to zntp'
+     name: 'allow interface to ntp'
      action: pass
      interface: "{{ interface_name }}"
      ipprotocol: inet
@@ -57,9 +57,9 @@
      before: 'bottom'
      state: present
 
-  - name: "allow interface to zmoncore rule"
+  - name: "allow interface to moncore rule"
     pfsense_rule:
-     name: 'allow interface to zmoncore'
+     name: 'allow interface to moncore'
      action: pass
      interface: "{{ interface_name }}"
      ipprotocol: inet
@@ -71,9 +71,9 @@
      before: 'bottom'
      state: present
 
-  - name: "allow interface to zloghost rule"
+  - name: "allow interface to loghost rule"
     pfsense_rule:
-     name: 'allow interface to zloghost'
+     name: 'allow interface to loghost'
      action: pass
      interface: "{{ interface_name }}"
      ipprotocol: inet
@@ -85,9 +85,9 @@
      before: 'bottom'
      state: present
 
-  - name: "allow interface to zmgmt rule"
+  - name: "allow interface to mgmt rule"
     pfsense_rule:
-     name: 'allow interface to zmgmt'
+     name: 'allow interface to mgmt'
      action: pass
      interface: "{{ interface_name }}"
      ipprotocol: inet
@@ -103,9 +103,9 @@
      state: present
 
 
-  - name: "allow interface to zgit servers rule"
+  - name: "allow interface to git servers rule"
     pfsense_rule:
-     name: 'allow interface to zgit servers'
+     name: 'allow interface to git servers'
      action: pass
      interface: "{{ interface_name }}"
      ipprotocol: inet
@@ -116,9 +116,9 @@
      before: 'bottom'
      state: present
 
-  - name: "allow interface to zproxy servers rule"
+  - name: "allow interface to proxy servers rule"
     pfsense_rule:
-     name: 'allow interface to zproxy servers'
+     name: 'allow interface to proxy servers'
      action: pass
      interface: "{{ interface_name }}"
      ipprotocol: inet
@@ -129,9 +129,9 @@
      before: 'bottom'
      state: present
 
-  - name: "allow interface to zapt_cache servers rule"
+  - name: "allow interface to apt_cache servers rule"
     pfsense_rule:
-     name: 'allow interface to zapt_cache servers'
+     name: 'allow interface to apt_cache servers'
      action: pass
      interface: "{{ interface_name }}"
      ipprotocol: inet
@@ -142,37 +142,59 @@
      before: 'bottom'
      state: present
 
-# uncomment these to allow automation hosts and bastion access.
-# i use global floating rules to allow access.
+  - name: "allow interface to puppet servers rule"
+    pfsense_rule:
+     name: 'allow interface to puppet servers rule'
+     action: pass
+     interface: "{{ interface_name }}"
+     ipprotocol: inet
+     protocol: tcp
+     source: "{{ interface_name }}"
+     destination: puppet_servers
+     destination_port: puppet_ports
+     after: 'top'
+     state: present
 
-#  - name: "allow interface to zansible rule"
-#    pfsense_rule:
-#     name: 'allow interface to zansible'
-#     action: pass
-#     interface: "{{ interface_name }}"
-#     ipprotocol: inet
-#     protocol: tcp
-#     source: ansible_servers
-#     destination: "{{ interface_name }}"
-#     destination_port: 22
-     #after: allow interface to mgmt rule
-#     before: 'bottom'
-#     state: present
+  - name: "allow interface to backup servers rule"
+    pfsense_rule:
+     name: 'allow interface to backup servers rule'
+     action: pass
+     interface: "{{ interface_name }}"
+     ipprotocol: inet
+     protocol: tcp
+     source: "{{ interface_name }}"
+     destination: backup_servers
+     destination_port: backup_ports
+     after: 'top'
+     state: present
 
-#  - name: "allow interface to bastion_mgmt rule"
-#    pfsense_rule:
-#     name: 'allow interface to bastion_mgmt'
-#     action: pass
-#     interface: "{{ interface_name }}"
-#     ipprotocol: inet
-#     protocol: tcp
-#     source: "{{ interface_name }}"
-#     destination: bastion_mgmt_servers
-     #destination_port: 
-     #after: allow interface to ansible rule
-#     before: 'bottom'
-#     state: present
-#
+
+  - name: "allow ansible to interface rule"
+    pfsense_rule:
+     name: 'allow ansible to interface rule'
+     action: pass
+     interface: "{{ interface_name }}"
+     ipprotocol: inet
+     protocol: tcp
+     source: ansible_servers
+     destination: "{{ interface_name }}"
+     destination_port: 22
+     after: 'top'
+     state: present
+
+  - name: "allow bastion_mgmt to interface rule"
+    pfsense_rule:
+     name: 'allow bastion_mgmt to interface rule'
+     action: pass
+     interface: "{{ interface_name }}"
+     ipprotocol: inet
+     protocol: tcp
+     source: bastion_servers
+     destination: "{{ interface_name }}"
+     destination_port: 22
+     after: 'top'
+     state: present
+
 
   - name: "Add standard block rule"
     pfsense_rule:
