@@ -10,7 +10,7 @@
   #become: yes
   #become_method: sudo
   vars:
-    network_card: em1
+    network_card: oce1
     vlan: 61
     interface_name: vault
 
@@ -181,9 +181,7 @@
      source: ansible_servers
      destination: "{{ interface_name }}"
      destination_port: ansible_ports
-    #after: allow interface to mgmt rule
-     #before: 'bottom'
-     before: 'top'
+     after: 'top'
      state: present
 
   - name: "allow bastion_mgmt to interface rule"
@@ -196,9 +194,7 @@
      source: bastion_servers
      destination: "{{ interface_name }}"
      destination_port: bastion_ports
-    #after: allow interface to mgmt rule
-     #before: 'bottom'
-     before: 'top'
+     after: 'top'
      state: present
 
   - name: "allow moncore prometheus to interface rule"
@@ -211,9 +207,7 @@
      source: moncore_servers
      destination: "{{ interface_name }}"
      destination_port: remote_monitoring_ports
-    #after: allow interface to mgmt rule
-     #before: 'bottom'
-     before: 'top'
+     after: 'top'
      state: present
 
 
@@ -226,7 +220,7 @@
      protocol: any
      source: any
      destination: RFC_1918
-     before: 'bottom'
+     after: 'bottom'
      state: present
 
   # to allow access to internett change interface to any

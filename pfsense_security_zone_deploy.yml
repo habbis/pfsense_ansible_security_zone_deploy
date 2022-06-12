@@ -3,15 +3,16 @@
   remote_user: ansible
   become: yes
   become_method: sudo
+  gather_facts: false
   #connection: paramiko
   collections:
     - pfsensible.core
   #become: yes
   #become_method: sudo
   vars:
-    network_card: em1
-    vlan: 61
-    interface_name: vault
+    network_card: oce1
+    vlan: 10
+    interface_name: bastion_mgmt
 
   tasks:
   - name: add vlans pfsense
@@ -40,7 +41,7 @@
      protocol: tcp/udp
      source: "{{ interface_name }}"
      destination: dns_servers
-     destination_port: 53
+     destination_port: dns_ports
      before: 'bottom'
      state: present
 
@@ -51,10 +52,9 @@
      interface: "{{ interface_name }}"
      ipprotocol: inet
      protocol: udp
-     destination_port: 123
+     destination_port: ntp_ports
      source: "{{ interface_name }}"
      destination: ntp_servers
-     #after: 'allow interface to dns rule'
      before: 'bottom'
      state: present
 
@@ -68,7 +68,6 @@
      source: "{{ interface_name }}"
      destination: moncore_servers
      destination_port: monitoring_ports
-     #after: allow interface to ntp rule
      before: 'bottom'
      state: present
 
@@ -82,7 +81,6 @@
      source: "{{ interface_name }}"
      destination: loghost_servers
      destination_port: syslog_ports
-     #after: allow interface to moncore rule
      before: 'bottom'
      state: present
 
@@ -96,7 +94,6 @@
      source: "{{ interface_name }}"
      destination: mgmt_servers
      destination_port: mgmt_ports
-     #after: allow interface to loghost rule
      before: 'bottom'
      state: present
 
@@ -179,10 +176,8 @@
      protocol: tcp
      source: ansible_servers
      destination: "{{ interface_name }}"
-     destination_port: 22
-    #after: allow interface to mgmt rule
-     #before: 'bottom'
-     before: 'top'
+     destination_port: ansible_ports
+     after: 'top'
      state: present
 
   - name: "allow bastion_mgmt to interface rule"
@@ -195,9 +190,7 @@
      source: bastion_servers
      destination: "{{ interface_name }}"
      destination_port: bastion_ports
-    #after: allow interface to mgmt rule
-     #before: 'bottom'
-     before: 'top'
+     after: 'top'
      state: present
 
   - name: "allow moncore prometheus to interface rule"
@@ -210,9 +203,7 @@
      source: moncore_servers
      destination: "{{ interface_name }}"
      destination_port: remote_monitoring_ports
-    #after: allow interface to mgmt rule
-     #before: 'bottom'
-     before: 'top'
+     after: 'top'
      state: present
 
   - name: "allow bastion_mgmt to interface rule"
@@ -224,7 +215,7 @@
      protocol: tcp
      source: bastion_servers
      destination: "{{ interface_name }}"
-     destination_port: 22
+     destination_port: bastion_ports
      after: 'top'
      state: present
 

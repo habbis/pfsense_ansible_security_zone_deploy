@@ -1,6 +1,6 @@
 ---
-- hosts: hf-router
-  remote_user: firstguy
+- hosts: pfsense
+  remote_user: ansible
   become: yes
   become_method: sudo
   gather_facts: false
@@ -66,7 +66,7 @@
 
   - name: Add alias sylog
     pfsense_alias:
-      name: sylog_servers
+      name: loghost_servers
       address: 10.31.4.2 10.31.4.3 10.31.4.4
       type: host
       state: present
@@ -129,7 +129,7 @@
 
   - name: Add port alias repository
     pfsense_alias:
-      name: monitoring_ports
+      name: repository_ports
       address: 80 443
       type: port
       state: present

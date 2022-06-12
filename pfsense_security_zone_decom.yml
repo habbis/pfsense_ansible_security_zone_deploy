@@ -1,6 +1,8 @@
 ---
 - hosts: pfsense
-  remote_user: root
+  remote_user: ansible
+  become: yes
+  become_method: sudo
   gather_facts: false
   #connection: paramiko
   collections:
