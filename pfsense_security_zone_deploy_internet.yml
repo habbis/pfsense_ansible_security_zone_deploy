@@ -1,6 +1,6 @@
 ---
 - hosts: pfsense
-  remote_user: firstguy
+  remote_user: ansible
   become: yes
   become_method: sudo
   gather_facts: false
@@ -41,7 +41,7 @@
      protocol: tcp/udp
      source: "{{ interface_name }}"
      destination: dns_servers
-     destination_port: 53
+     destination_port: dns_ports
      before: 'bottom'
      state: present
 
@@ -52,7 +52,7 @@
      interface: "{{ interface_name }}"
      ipprotocol: inet
      protocol: udp
-     destination_port: 123
+     destination_port: ntp_ports
      source: "{{ interface_name }}"
      destination: ntp_servers
      #after: 'allow interface to dns rule'
@@ -128,16 +128,16 @@
      before: 'bottom'
      state: present
 
-  - name: "allow interface to apt_cache servers rule"
+  - name: "allow interface to repository servers rule"
     pfsense_rule:
-     name: 'allow interface to apt_cache servers'
+     name: 'allow interface to repository servers'
      action: pass
      interface: "{{ interface_name }}"
      ipprotocol: inet
      protocol: tcp
      source: "{{ interface_name }}"
-     destination: zapt_cache_servers
-     destination_port: apt_cache_ports
+     destination: repository_servers
+     destination_port: repository_ports
      before: 'bottom'
      state: present
 
@@ -180,7 +180,7 @@
      protocol: tcp
      source: ansible_servers
      destination: "{{ interface_name }}"
-     destination_port: 22
+     destination_port: ansible_ports
     #after: allow interface to mgmt rule
      #before: 'bottom'
      before: 'top'
@@ -201,7 +201,7 @@
      before: 'top'
      state: present
 
-     - name: "allow moncore prometheus to interface rule"
+  - name: "allow moncore prometheus to interface rule"
     pfsense_rule:
      name: 'allow bastion_mgmt to interface rule'
      action: pass

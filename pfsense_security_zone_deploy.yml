@@ -1,7 +1,8 @@
 ---
 - hosts: pfsense
-  remote_user: root
-  gather_facts: false
+  remote_user: ansible
+  become: yes
+  become_method: sudo
   #connection: paramiko
   collections:
     - pfsensible.core
@@ -126,16 +127,16 @@
      before: 'bottom'
      state: present
 
-  - name: "allow interface to apt_cache servers rule"
+  - name: "allow interface to repository servers rule"
     pfsense_rule:
-     name: 'allow interface to apt_cache servers'
+     name: 'allow interface to repository servers'
      action: pass
      interface: "{{ interface_name }}"
      ipprotocol: inet
      protocol: tcp
      source: "{{ interface_name }}"
-     destination: zapt_cache_servers
-     destination_port: apt_cache_ports
+     destination: repository_servers
+     destination_port: repository_ports
      before: 'bottom'
      state: present
 
@@ -199,7 +200,7 @@
      before: 'top'
      state: present
 
-     - name: "allow moncore prometheus to interface rule"
+  - name: "allow moncore prometheus to interface rule"
     pfsense_rule:
      name: 'allow bastion_mgmt to interface rule'
      action: pass
