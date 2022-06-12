@@ -1,27 +1,220 @@
 ---
-- hosts: pfsense
-  remote_user: root
+- hosts: hf-router
+  remote_user: firstguy
+  become: yes
+  become_method: sudo
   gather_facts: false
   #connection: paramiko
   collections:
     - pfsensible.core
-
-  #remote_user: xo
-  #remote_user: user
-  #remote_user: ansible
-  #remote_user: ebbestad
-  #become: yes
-  #become_method: sudo
   vars:
     alias_name: dns_serves
-    network1: 10.50.140.0/24
-    network2: 10.50.141.0/24
+    #network1:
+    #network2:
     ipv4_address: 10.50.131.20
 
 
   tasks:
-  - name: Add adservers alias
+  - name: Add  alias dns
     pfsense_alias:
-      name: "{{ alias_name }}"
-      address:  "{{ network1 }} {{ network2 }}  {{ ipv4_address }}"
+      name: dns_servers
+      address: 10.17.2.2 10.17.2.3
+      type: host
+      state: present
+
+  - name: Add port alias dns
+    pfsense_alias:
+      name: dns_ports
+      address: 53
+      type: port
+      state: present
+
+  - name: Add alias ntp
+    pfsense_alias:
+      name: ntp_servers
+      address: 10.31.4.2 10.31.4.3 10.31.4.4
+      type: host
+      state: present
+
+  - name: Add port alias ntp
+    pfsense_alias:
+      name: ntp_ports
+      address: 53
+      type: port
+      state: present
+
+  - name: Add alias moncore
+    pfsense_alias:
+      name: moncore_servers
+      address: 10.31.4.2 10.31.4.3 10.31.4.4
+      type: host
+      state: present
+
+  - name: Add port alias moncore
+    pfsense_alias:
+      name: monitoring_ports
+      address: 53
+      type: port
+      state: present
+
+  - name: Add port alias moncore
+    pfsense_alias:
+      name: remote_monitoring_ports
+      address: 9100 22
+      type: port
+      state: present
+
+  - name: Add alias sylog
+    pfsense_alias:
+      name: sylog_servers
+      address: 10.31.4.2 10.31.4.3 10.31.4.4
+      type: host
+      state: present
+
+  - name: Add port alias syslog
+    pfsense_alias:
+      name: syslog_ports
+      address: 514
+      type: port
+      state: present
+
+  - name: Add alias mgmt
+    pfsense_alias:
+      name: mgmt_servers
+      address: 10.31.7.2 10.31.7.3
+      type: host
+      state: present
+
+  - name: Add port alias mgmt
+    pfsense_alias:
+      name: mgmt_ports
+      address: 389
+      type: port
+      state: present
+
+  - name: Add alias git
+    pfsense_alias:
+      name: git_servers
+      address: 10.31.7.2 10.31.7.3
+      type: host
+      state: present
+
+  - name: Add port alias git
+    pfsense_alias:
+      name: git_ports
+      address: 22 80 443
+      type: port
+      state: present
+
+  - name: Add alias proxy
+    pfsense_alias:
+      name: proxy_servers
+      address: 10.31.7.2 10.31.7.3
+      type: host
+      state: present
+
+  - name: Add port alias proxy
+    pfsense_alias:
+      name: proxy_ports
+      address: 8888
+      type: port
+      state: present
+
+  - name: Add alias repository
+    pfsense_alias:
+      name: repository_servers
+      address: 10.31.7.2 10.31.7.3
+      type: host
+      state: present
+
+  - name: Add port alias repository
+    pfsense_alias:
+      name: monitoring_ports
+      address: 80 443
+      type: port
+      state: present
+
+  - name: Add alias backup
+    pfsense_alias:
+      name: backup_servers
+      address: 10.31.7.2 10.31.7.3
+      type: host
+      state: present
+
+  - name: Add port alias backup
+    pfsense_alias:
+      name: backup_ports
+      address: 22 21
+      type: port
+      state: present
+
+  - name: Add alias storage
+    pfsense_alias:
+      name: storage_servers
+      address: 10.31.7.2 10.31.7.3
+      type: host
+      state: present
+
+  - name: Add port alias storage
+    pfsense_alias:
+      name: storage_ports
+      address: 53
+      type: port
+      state: present
+
+  - name: Add alias ansible
+    pfsense_alias:
+      name: ansible_servers
+      address: 10.31.7.2 10.31.7.3
+      type: host
+      state: present
+
+  - name: Add port alias ansible
+    pfsense_alias:
+      name: ansible_ports
+      address: 22
+      type: port
+      state: present
+
+  - name: Add alias automation
+    pfsense_alias:
+      name: automation_servers
+      address: 10.31.7.2 10.31.7.3
+      type: host
+      state: present
+
+  - name: Add port alias automation
+    pfsense_alias:
+      name: automation_ports
+      address: 22
+      type: port
+      state: present
+
+  - name: Add alias puppet
+    pfsense_alias:
+      name: puppet_servers
+      address: 10.31.7.2 10.31.7.3
+      type: host
+      state: present
+
+  - name: Add port alias puppet
+    pfsense_alias:
+      name: puppet_ports
+      address: 8140 443 80
+      type: port
+      state: present
+
+
+  - name: Add alias bastion
+    pfsense_alias:
+      name: bastion_servers
+      address: 10.31.7.2 10.31.7.3
+      type: host
+      state: present
+
+  - name: Add port alias bastion
+    pfsense_alias:
+      name: bastion_ports
+      address: 8140 443 80
+      type: port
       state: present

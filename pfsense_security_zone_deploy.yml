@@ -94,9 +94,6 @@
      protocol: tcp
      source: "{{ interface_name }}"
      destination: mgmt_servers
-     # ldap
-     #destination_port: 389
-     # ldaps
      destination_port: mgmt_ports
      #after: allow interface to loghost rule
      before: 'bottom'
@@ -169,6 +166,9 @@
      state: present
 
 
+# uncomment these to allow automation hosts and bastion access.
+# i use global floating rules to allow access.
+
   - name: "allow ansible to interface rule"
     pfsense_rule:
      name: 'allow ansible to interface rule'
@@ -179,7 +179,39 @@
      source: ansible_servers
      destination: "{{ interface_name }}"
      destination_port: 22
-     after: 'top'
+    #after: allow interface to mgmt rule
+     #before: 'bottom'
+     before: 'top'
+     state: present
+
+  - name: "allow bastion_mgmt to interface rule"
+    pfsense_rule:
+     name: 'allow bastion_mgmt to interface rule'
+     action: pass
+     interface: "{{ interface_name }}"
+     ipprotocol: inet
+     protocol: tcp
+     source: bastion_servers
+     destination: "{{ interface_name }}"
+     destination_port: bastion_ports
+    #after: allow interface to mgmt rule
+     #before: 'bottom'
+     before: 'top'
+     state: present
+
+     - name: "allow moncore prometheus to interface rule"
+    pfsense_rule:
+     name: 'allow bastion_mgmt to interface rule'
+     action: pass
+     interface: "{{ interface_name }}"
+     ipprotocol: inet
+     protocol: tcp
+     source: moncore_servers
+     destination: "{{ interface_name }}"
+     destination_port: remote_monitoring_ports
+    #after: allow interface to mgmt rule
+     #before: 'bottom'
+     before: 'top'
      state: present
 
   - name: "allow bastion_mgmt to interface rule"
