@@ -11,8 +11,8 @@
   #become_method: sudo
   vars:
     network_card: oce1
-    vlan: 10
-    interface_name: bastion_mgmt
+    vlan: 21
+    interface_name: office
 
   tasks:
   - name: add vlans pfsense

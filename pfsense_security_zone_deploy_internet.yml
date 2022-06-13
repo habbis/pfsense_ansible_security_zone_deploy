@@ -11,8 +11,8 @@
   #become_method: sudo
   vars:
     network_card: oce1
-    vlan: 61
-    interface_name: vault
+    vlan: 21
+    interface_name: office
 
   tasks:
   - name: add vlans pfsense
@@ -220,7 +220,7 @@
      protocol: any
      source: any
      destination: RFC_1918
-     after: 'bottom'
+     before: 'bottom'
      state: present
 
   # to allow access to internett change interface to any
